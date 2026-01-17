@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct TrackoryApp: App {
@@ -13,5 +14,10 @@ struct TrackoryApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: [Item.self, Consumption.self])
+    }
+    
+    init() {
+        print(URL.applicationSupportDirectory.path(percentEncoded: false))
     }
 }
