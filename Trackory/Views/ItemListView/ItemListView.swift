@@ -18,7 +18,9 @@ struct ItemListView: View {
         NavigationStack{
             List {
                 ForEach(items) { item in
-                    Text(item.name)
+                    NavigationLink (value: item) {
+                        ItemListRow(item: item)
+                    }
                 }
             }
             .overlay(VStack {
@@ -31,6 +33,9 @@ struct ItemListView: View {
                 }
             })
             .scrollDisabled(items.isEmpty)
+            .navigationDestination(for: Item.self) { item in
+                ItemDetailView(item: item, onDeleteItem: { _ in })
+            }
             .navigationTitle("Food")
             .toolbar {
                 Button {
