@@ -6,18 +6,31 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ItemListView: View {
     @State private var searchTerm: String = ""
     @State private var isPresented: Bool = false
     
+    @Query private var items: [Item]
+    
     var body: some View {
         NavigationStack{
             List {
-                Text("Item 1")
-                Text("Item 2")
-                Text("Item 3")
+                ForEach(items) { item in
+                    Text(item.name)
+                }
             }
+            .overlay(VStack {
+                if items.isEmpty {
+                    Spacer().frame(maxHeight: 150)
+                    Text("No items available.")
+                    Spacer().frame(maxHeight: 15)
+                    Text("Add first item to get started.")
+                    Spacer()
+                }
+            })
+            .scrollDisabled(items.isEmpty)
             .navigationTitle("Food")
             .toolbar {
                 Button {

@@ -26,9 +26,9 @@ struct ContentView: View {
                 ItemListView()
             }
         }
-        .tabViewBottomAccessory(isEnabled: selectedTab == 0) {
-            ProgressBarView()
-        }
+//        .tabViewBottomAccessory(isEnabled: selectedTab == 0) {
+//            ProgressBarView()
+//        }
     }
 }
 
