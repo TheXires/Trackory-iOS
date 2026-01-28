@@ -14,10 +14,17 @@ struct ItemListView: View {
     
     @Query private var items: [Item]
     
+    var filteredItems: [Item] {
+        let lowercasedSearchTerm = searchTerm.lowercased()
+        return searchTerm.isEmpty ? items : items.filter {
+            $0.name.lowercased().contains(lowercasedSearchTerm)
+        }
+    }
+    
     var body: some View {
         NavigationStack{
             List {
-                ForEach(items) { item in
+                ForEach(filteredItems) { item in
                     NavigationLink (value: item) {
                         ItemListRow(item: item)
                     }
