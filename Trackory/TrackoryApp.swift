@@ -10,9 +10,12 @@ import SwiftData
 
 @main
 struct TrackoryApp: App {
+    @State private var settings = AppSettings()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(settings)
         }
         .modelContainer(for: [Item.self, Consumption.self])
     }

@@ -6,39 +6,45 @@
 //
 
 import SwiftUI
+import Observation
 
 enum UserDefaultsKey: String {
     case calorieTarget = "calorieTarget"
     case colorScheme = "colorScheme"
 }
 
-@propertyWrapper
-struct TypedAppStorage<T: Codable> {
-    let key: UserDefaultsKey
-    let defaultValue: T
-    var storage: UserDefaults = .standard
-    
-    var wrappedValue: T {
-        get {
-            // Wir lesen die Daten als 'Data' (JSON)
-            guard let data = storage.data(forKey: key.rawValue) else {
-                return defaultValue
-            }
-            // Und verwandeln sie zurück in deinen Typ T
-            return (try? JSONDecoder().decode(T.self, from: data)) ?? defaultValue
-        }
-        set {
-            // Wir verwandeln das Objekt in JSON-Data
-            if let encoded = try? JSONEncoder().encode(newValue) {
-                storage.set(encoded, forKey: key.rawValue)
-            }
-        }
+enum Design: String, CaseIterable, Codable {
+    case system
+    case light
+    case dark
+}
+
+@Observable
+class AppSettings {
+    var calorieTarget: Float {
+        didSet { save(calorieTarget, for: .calorieTarget) }
+    }
+    var design: Design {
+        didSet { save(design, for: .colorScheme) }
     }
     
-    var projectedValue: Binding<T> {
-        Binding(
-            get: { self.wrappedValue },
-            set: { self.wrappedValue = $0 }
-        )
+    init() {
+        calorieTarget = AppSettings.load(for: .calorieTarget, default: 2100)
+        design        = AppSettings.load(for: .colorScheme,   default: .system)
+    }
+    
+    // MARK: - Persistence
+    
+    private static func load<T: Codable>(for key: UserDefaultsKey, default fallback: T) -> T {
+        guard let data = UserDefaults.standard.data(forKey: key.rawValue),
+              let value = try? JSONDecoder().decode(T.self, from: data)
+        else { return fallback }
+        return value
+    }
+    
+    private func save<T: Codable>(_ value: T, for key: UserDefaultsKey) {
+        if let data = try? JSONEncoder().encode(value) {
+            UserDefaults.standard.set(data, forKey: key.rawValue)
+        }
     }
 }

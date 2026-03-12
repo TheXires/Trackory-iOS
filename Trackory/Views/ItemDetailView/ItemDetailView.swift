@@ -23,7 +23,7 @@ struct ItemDetailView: View {
             ItemDetailNutritionView(item: item)
         }
         .sheet(isPresented: $isEditMode) {
-//            TODO: Add EditItemView(item: item)
+            EditItemView(item: item)
         }
         .toolbar {
             ToolbarItemGroup (placement: .topBarTrailing) {
@@ -35,6 +35,8 @@ struct ItemDetailView: View {
                 Button(role: .destructive) {
                     onDeleteItem(item)
                     dismiss()
+                } label: {
+                    Image(systemName: "trash")
                 }
             }
         }

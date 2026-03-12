@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct ItemListView: View {
+    @Environment(\.modelContext) private var context
     @State private var searchTerm: String = ""
     @State private var isPresented: Bool = false
     
@@ -41,7 +42,9 @@ struct ItemListView: View {
             })
             .scrollDisabled(items.isEmpty)
             .navigationDestination(for: Item.self) { item in
-                ItemDetailView(item: item, onDeleteItem: { _ in })
+                ItemDetailView(item: item, onDeleteItem: { itemToDelete in
+                    context.delete(itemToDelete)
+                })
             }
             .navigationTitle("Food")
             .toolbar {

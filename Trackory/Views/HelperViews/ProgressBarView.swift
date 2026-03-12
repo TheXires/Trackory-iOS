@@ -6,16 +6,30 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ProgressBarView: View {
-    @TypedAppStorage(key: .calorieTarget, defaultValue: 2100) var calorieTarget: Float
+    @Environment(AppSettings.self) private var settings
+    @Query private var consumptions: [Consumption]
+    
+    private var todayCalories: Float {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        return consumptions
+            .filter { calendar.startOfDay(for: $0.date) == today }
+            .reduce(0) { $0 + Float($1.calories * $1.quantity) }
+    }
+    
+    private var remaining: Float {
+        max(settings.calorieTarget - todayCalories, 0)
+    }
     
     var body: some View {
         ProgressView(
-            value: 50,
-            total: calorieTarget
+            value: min(todayCalories, settings.calorieTarget),
+            total: settings.calorieTarget
         ) {} currentValueLabel: {
-            Text("50 calroies left")
+            Text("\(Int(remaining)) calories left")
         }
         .progressViewStyle(.linear)
         .padding()
@@ -23,5 +37,6 @@ struct ProgressBarView: View {
 }
 
 #Preview {
-    ProgressView()
+    ProgressBarView()
+        .environment(AppSettings())
 }
