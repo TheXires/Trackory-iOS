@@ -11,11 +11,14 @@ import SwiftData
 @main
 struct TrackoryApp: App {
     @State private var settings = AppSettings()
+    @State private var flyCoordinator = FlyToTabCoordinator()
     
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(settings)
+                .environment(flyCoordinator)
+                .flyToTabAnimationOverlay(coordinator: flyCoordinator)
         }
         .modelContainer(for: [Item.self, Consumption.self])
     }

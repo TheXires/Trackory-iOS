@@ -10,19 +10,41 @@ import SwiftData
 
 struct ItemListRow: View {
     @Environment(\.modelContext) private var context
+    @Environment(FlyToTabCoordinator.self) private var flyCoordinator
     var item: Item
     
     var body: some View {
+        GeometryReader { geo in
+            rowContent
+                .onTapGesture { } // keeps tap handling on button only
+                .overlay(alignment: .trailing) {
+                    Button {
+                        let frame = geo.frame(in: .global)
+                        let origin = CGPoint(x: frame.midX, y: frame.midY)
+                        flyCoordinator.fly(from: origin, size: frame.size) {
+                            rowContent
+                        }
+                        addConsumption()
+                    } label: {
+                        Image(systemName: "plus")
+                            .frame(width: 20, height: 20)
+                    }
+                    .buttonStyle(.bordered)
+                    .padding(.trailing, 4)
+                }
+                .frame(height: 44)
+        }
+        .frame(height: 44)
+    }
+    
+    private var rowContent: some View {
         HStack {
             Text(item.name)
             Spacer()
-            Button {
-                addConsumption()
-            } label: {
-                Image(systemName: "plus")
-                    .frame(width: 20, height: 20)
-            }
-            .buttonStyle(.bordered)
+            Image(systemName: "plus")
+                .frame(width: 20, height: 20)
+                .buttonStyle(.bordered)
+                .opacity(0) // placeholder to keep layout stable
         }
     }
     
@@ -59,5 +81,5 @@ struct ItemListRow: View {
     ItemListRow(
         item: Item(calories: 100, carbohydrates: 0, fat: 0, name: "Toast", protein: 0)
     )
+    .environment(FlyToTabCoordinator())
 }
-
