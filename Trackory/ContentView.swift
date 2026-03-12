@@ -8,6 +8,10 @@
 import SwiftUI
 
 struct ContentView: View {
+    @TypedAppStorage(
+        key: .colorScheme,
+        defaultValue: .system
+    ) var design: Design
     
     @State private var selectedTab: Int = 0
     @State private var searchTerm: String = ""
@@ -26,9 +30,10 @@ struct ContentView: View {
                 ItemListView()
             }
         }
-//        .tabViewBottomAccessory(isEnabled: selectedTab == 0) {
-//            ProgressBarView()
-//        }
+        .preferredColorScheme(nil)
+        .tabViewBottomAccessory(isEnabled: selectedTab == 0) {
+            ProgressBarView()
+        }
     }
 }
 

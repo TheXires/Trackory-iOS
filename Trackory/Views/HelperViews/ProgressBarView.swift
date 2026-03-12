@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct ProgressBarView: View {
+    @TypedAppStorage(key: .calorieTarget, defaultValue: 2100) var calorieTarget: Float
+    
     var body: some View {
         ProgressView(
             value: 50,
-            total: 100
+            total: calorieTarget
         ) {} currentValueLabel: {
             Text("50 calroies left")
         }
