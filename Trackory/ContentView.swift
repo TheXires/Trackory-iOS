@@ -36,7 +36,7 @@ struct ContentView: View {
                 ItemListView()
             }
         }
-        .preferredColorScheme(preferredScheme)
+        .preferredColorScheme(settings.design == .light ? .light : settings.design == .dark ? .dark : nil)
         .tabViewBottomAccessory(isEnabled: selectedTab == 0) {
             ProgressBarView()
         }
