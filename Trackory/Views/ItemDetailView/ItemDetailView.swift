@@ -11,7 +11,6 @@ struct ItemDetailView: View {
     @Environment(\.dismiss) var dismiss
     @State var isEditMode: Bool = false
     @State var item: Item
-    
     var onDeleteItem: (Item) -> Void
     
     var body: some View {
@@ -26,7 +25,7 @@ struct ItemDetailView: View {
             EditItemView(item: item)
         }
         .toolbar {
-            ToolbarItemGroup (placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
                     isEditMode = true
                 } label: {
@@ -43,10 +42,9 @@ struct ItemDetailView: View {
     }
 }
 
-
 #Preview {
     ItemDetailView(
-        item:
-            Item(calories: 100, carbohydrates: 0, fat: 0, name: "Toast", protein: 0),
-        onDeleteItem: { _ in })
+        item: Item(calories: 100, carbohydrates: 0, fat: 0, name: "Toast", protein: 0),
+        onDeleteItem: { _ in }
+    )
 }

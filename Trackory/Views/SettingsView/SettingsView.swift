@@ -30,9 +30,7 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
-            .onTapGesture {
-                hideKeyboard()
-            }
+            .scrollDismissesKeyboard(.immediately)
         }
     }
 }

@@ -23,10 +23,10 @@ struct ItemListView: View {
     }
     
     var body: some View {
-        NavigationStack{
+        NavigationStack {
             List {
                 ForEach(filteredItems) { item in
-                    NavigationLink (value: item) {
+                    NavigationLink(value: item) {
                         ItemListRow(item: item)
                     }
                 }

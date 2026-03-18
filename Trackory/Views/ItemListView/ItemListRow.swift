@@ -13,39 +13,43 @@ struct ItemListRow: View {
     @Environment(FlyToTabCoordinator.self) private var flyCoordinator
     var item: Item
     
+    @State private var rowFrame: CGRect = .zero
+    
     var body: some View {
-        GeometryReader { geo in
-            rowContent
-                .onTapGesture { } // keeps tap handling on button only
-                .overlay(alignment: .trailing) {
-                    Button {
-                        let frame = geo.frame(in: .global)
-                        let origin = CGPoint(x: frame.midX, y: frame.midY)
-                        flyCoordinator.fly(from: origin, size: frame.size) {
-                            rowContent
-                        }
-                        addConsumption()
-                    } label: {
-                        Image(systemName: "plus")
-                            .frame(width: 20, height: 20)
-                    }
-                    .buttonStyle(.bordered)
-                    .padding(.trailing, 4)
+        HStack {
+            Text(item.name)
+            Spacer()
+            Button {
+                flyCoordinator.fly(from: CGPoint(x: rowFrame.midX, y: rowFrame.midY),
+                                   size: rowFrame.size) {
+                    rowContent
                 }
-                .frame(height: 44)
+                addConsumption()
+            } label: {
+                Image(systemName: "plus")
+                    .frame(width: 20, height: 20)
+            }
+            .buttonStyle(.bordered)
+            // Stop the button tap from also triggering the NavigationLink
+            .simultaneousGesture(TapGesture())
         }
-        .frame(height: 44)
+        // Capture the row's global frame without disrupting the layout
+        .background {
+            GeometryReader { geo in
+                Color.clear
+                    .onAppear { rowFrame = geo.frame(in: .global) }
+                    .onChange(of: geo.frame(in: .global)) { _, new in rowFrame = new }
+            }
+        }
     }
     
     private var rowContent: some View {
         HStack {
             Text(item.name)
             Spacer()
-            Image(systemName: "plus")
-                .frame(width: 20, height: 20)
-                .buttonStyle(.bordered)
-                .opacity(0) // placeholder to keep layout stable
         }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 16)
     }
     
     private func addConsumption() {
