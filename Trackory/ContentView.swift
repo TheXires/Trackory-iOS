@@ -9,22 +9,34 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AppSettings.self) private var settings
+    @AppStorage(UserDefaultsKey.colorScheme.rawValue) private var colorSchemeSetting: String = Design.system.rawValue
     
     @State private var selectedTab: Int = 0
+    
+    private var preferredScheme: ColorScheme? {
+        switch Design(rawValue: colorSchemeSetting) ?? .system {
+        case .system: return nil
+        case .light: return .light
+        case .dark: return .dark
+        }
+    }
     
     var body: some View {
         TabView(selection: $selectedTab) {
             Tab("Today", systemImage: "fork.knife", value: 0) {
                 TodayView()
             }
-            Tab("Settings", systemImage: "gear", value: 1) {
+            Tab("Statistics", systemImage: "chart.bar.fill", value: 1) {
+                WeeklyChartView()
+            }
+            Tab("Settings", systemImage: "gear", value: 2) {
                 SettingsView()
             }
-            Tab("Food", systemImage: "carrot.fill", value: 2, role: .search) {
+            Tab("Food", systemImage: "carrot.fill", value: 3, role: .search) {
                 ItemListView()
             }
         }
-        .preferredColorScheme(settings.design == .light ? .light : settings.design == .dark ? .dark : nil)
+        .preferredColorScheme(preferredScheme)
         .tabViewBottomAccessory(isEnabled: selectedTab == 0) {
             ProgressBarView()
         }
