@@ -194,7 +194,7 @@ struct WeeklyChartView: View {
                 
                 // Details
                 Section(header: Text("Details")) {
-                    ForEach(buckets) { bucket in
+                    ForEach(buckets.reversed()) { bucket in
                         HStack {
                             Text(detailLabel(for: bucket))
                                 .font(.subheadline)

@@ -17,9 +17,10 @@ struct ItemListView: View {
     
     var filteredItems: [Item] {
         let lowercasedSearchTerm = searchTerm.lowercased()
-        return searchTerm.isEmpty ? items : items.filter {
+        let filtered = searchTerm.isEmpty ? items : items.filter {
             $0.name.lowercased().contains(lowercasedSearchTerm)
         }
+        return filtered.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
     
     var body: some View {
