@@ -36,6 +36,14 @@ struct SettingsView: View {
                         }
                     }
                 }
+                Section(header: Text("Language")) {
+                    Picker("Language", selection: $settings.language) {
+                        ForEach(AppLanguage.allCases) { lang in
+                            Text(lang.displayName)
+                                .tag(lang)
+                        }
+                    }
+                }
             }
             .navigationTitle("Settings")
         }

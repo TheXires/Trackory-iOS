@@ -23,10 +23,10 @@ struct ItemFormView: View {
         Form {
             TextField("Name", text: $name)
                 .focused($isFieldFocused)
-            NumberField(name: "Calories", value: $calories)
-            NumberField(name: "Carbohydrates", value: $carbohydrates)
-            NumberField(name: "Fat", value: $fat)
-            NumberField(name: "Protein", value: $protein)
+            NumberField(name: String(localized: "Calories"), value: $calories)
+            NumberField(name: String(localized: "Carbohydrates"), value: $carbohydrates)
+            NumberField(name: String(localized: "Fat"), value: $fat)
+            NumberField(name: String(localized: "Protein"), value: $protein)
         }
         .onAppear {
             isFieldFocused = true

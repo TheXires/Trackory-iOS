@@ -24,8 +24,8 @@ struct TodayView: View {
     }
     
     private var dateLabel: String {
-        if isToday { return "Today" }
-        if Calendar.current.isDateInYesterday(selectedDate) { return "Yesterday" }
+        if isToday { return String(localized: "Today") }
+        if Calendar.current.isDateInYesterday(selectedDate) { return String(localized: "Yesterday") }
         return selectedDate.formatted(.dateTime.day().month(.abbreviated).year())
     }
     

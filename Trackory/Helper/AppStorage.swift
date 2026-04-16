@@ -11,6 +11,7 @@ import Observation
 enum UserDefaultsKey: String {
     case calorieTarget = "calorieTarget"
     case colorScheme = "colorScheme"
+    case language = "language"
 }
 
 enum Design: String, CaseIterable, Codable {
@@ -27,10 +28,14 @@ class AppSettings {
     var design: Design {
         didSet { save(design, for: .colorScheme) }
     }
+    var language: AppLanguage {
+        didSet { save(language, for: .language) }
+    }
     
     init() {
         calorieTarget = AppSettings.load(for: .calorieTarget, default: 2100)
         design        = AppSettings.load(for: .colorScheme,   default: .system)
+        language      = AppSettings.load(for: .language,      default: .system)
     }
     
     // MARK: - Persistence

@@ -9,15 +9,15 @@ import SwiftUI
 
 struct EditItemView: View {
     @Environment(\.dismiss) var dismiss
-
+    
     var item: Item
-
+    
     @State private var name: String
     @State private var calories: Int?
     @State private var carbohydrates: Int?
     @State private var fat: Int?
     @State private var protein: Int?
-
+    
     init(item: Item) {
         self.item = item
         _name         = State(initialValue: item.name)
@@ -26,7 +26,7 @@ struct EditItemView: View {
         _fat          = State(initialValue: item.fat)
         _protein      = State(initialValue: item.protein)
     }
-
+    
     var body: some View {
         NavigationStack {
             ItemFormView(

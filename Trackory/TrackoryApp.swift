@@ -18,6 +18,7 @@ struct TrackoryApp: App {
             ContentView()
                 .environment(settings)
                 .environment(flyCoordinator)
+                .environment(\.locale, settings.language.resolvedLocale)
                 .flyToTabAnimationOverlay(coordinator: flyCoordinator)
         }
         .modelContainer(for: [Item.self, Consumption.self])

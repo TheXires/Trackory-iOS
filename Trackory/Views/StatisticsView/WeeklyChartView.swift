@@ -49,7 +49,7 @@ struct WeeklyChartView: View {
             let endDate = calendar.date(byAdding: .weekOfYear, value: offset, to: today)!
             let startDate = calendar.date(byAdding: .day, value: -6, to: endDate)!
             if offset == 0 {
-                return "This Week"
+                return String(localized: "This Week")
             }
             return "\(startDate.formatted(.dateTime.day().month(.abbreviated))) – \(endDate.formatted(.dateTime.day().month(.abbreviated)))"
         case .month:
@@ -57,7 +57,7 @@ struct WeeklyChartView: View {
             let comps = calendar.dateComponents([.year, .month], from: refDate)
             let monthStart = calendar.date(from: comps)!
             if offset == 0 {
-                return "This Month"
+                return String(localized: "This Month")
             }
             return monthStart.formatted(.dateTime.month(.wide).year())
         }
@@ -122,7 +122,7 @@ struct WeeklyChartView: View {
                 Section {
                     Picker("Range", selection: $selectedRange) {
                         ForEach(StatisticsRange.allCases) { range in
-                            Text(range.rawValue).tag(range)
+                            Text(range == .week ? "Week" : "Month").tag(range)
                         }
                     }
                     .pickerStyle(.segmented)
