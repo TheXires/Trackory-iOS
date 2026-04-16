@@ -12,6 +12,7 @@ struct ItemListRow: View {
     @Environment(\.modelContext) private var context
     @Environment(FlyToTabCoordinator.self) private var flyCoordinator
     var item: Item
+    @Binding var selectedDate: Date
     
     @State private var rowFrame: CGRect = .zero
     
@@ -54,22 +55,22 @@ struct ItemListRow: View {
     
     private func addConsumption() {
         let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
+        let targetDay = calendar.startOfDay(for: selectedDate)
         
-        // Fetch existing consumption for this item today
+        // Fetch existing consumption for this item on the selected date
         let itemId = item.id
         let descriptor = FetchDescriptor<Consumption>(
             predicate: #Predicate { $0.itemId == itemId }
         )
         if let existing = try? context.fetch(descriptor).first(where: {
-            calendar.startOfDay(for: $0.date) == today
+            calendar.startOfDay(for: $0.date) == targetDay
         }) {
             existing.quantity += 1
         } else {
             let consumption = Consumption(
                 calories: item.calories,
                 carbohydrates: item.carbohydrates,
-                date: Date(),
+                date: selectedDate,
                 fat: item.fat,
                 itemId: item.id,
                 name: item.name,
@@ -83,7 +84,8 @@ struct ItemListRow: View {
 
 #Preview {
     ItemListRow(
-        item: Item(calories: 100, carbohydrates: 0, fat: 0, name: "Toast", protein: 0)
+        item: Item(calories: 100, carbohydrates: 0, fat: 0, name: "Toast", protein: 0),
+        selectedDate: .constant(Date())
     )
     .environment(FlyToTabCoordinator())
 }

@@ -12,6 +12,7 @@ struct ContentView: View {
     @AppStorage(UserDefaultsKey.colorScheme.rawValue) private var colorSchemeSetting: String = Design.system.rawValue
     
     @State private var selectedTab: Int = 0
+    @State private var selectedDate: Date = Date()
     
     private var preferredScheme: ColorScheme? {
         switch Design(rawValue: colorSchemeSetting) ?? .system {
@@ -24,7 +25,7 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             Tab("Today", systemImage: "fork.knife", value: 0) {
-                TodayView()
+                TodayView(selectedDate: $selectedDate)
             }
             Tab("Statistics", systemImage: "chart.bar.fill", value: 1) {
                 WeeklyChartView()
@@ -33,7 +34,7 @@ struct ContentView: View {
                 SettingsView()
             }
             Tab("Food", systemImage: "carrot.fill", value: 3, role: .search) {
-                ItemListView()
+                ItemListView(selectedDate: $selectedDate)
             }
         }
         .preferredColorScheme(settings.design == .light ? .light : settings.design == .dark ? .dark : nil)

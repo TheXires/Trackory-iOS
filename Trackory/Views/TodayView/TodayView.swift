@@ -11,17 +11,28 @@ import SwiftData
 struct TodayView: View {
     @Environment(\.modelContext) private var context
     @Query private var consumptions: [Consumption]
+    @Binding var selectedDate: Date
     
-    private var todayConsumptions: [Consumption] {
+    private var isToday: Bool {
+        Calendar.current.isDateInToday(selectedDate)
+    }
+    
+    private var dateConsumptions: [Consumption] {
         let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        return consumptions.filter { calendar.startOfDay(for: $0.date) == today }
+        let day = calendar.startOfDay(for: selectedDate)
+        return consumptions.filter { calendar.startOfDay(for: $0.date) == day }
+    }
+    
+    private var dateLabel: String {
+        if isToday { return "Today" }
+        if Calendar.current.isDateInYesterday(selectedDate) { return "Yesterday" }
+        return selectedDate.formatted(.dateTime.day().month(.abbreviated).year())
     }
     
     var body: some View {
         NavigationStack {
             List {
-                ForEach(todayConsumptions) { consumption in
+                ForEach(dateConsumptions) { consumption in
                     TodayListRow(
                         consumption: consumption,
                         onIncrease: increaseQuantity,
@@ -31,7 +42,7 @@ struct TodayView: View {
                 .onDelete(perform: deleteConsumptions)
             }
             .overlay {
-                if todayConsumptions.isEmpty {
+                if dateConsumptions.isEmpty {
                     VStack(spacing: 12) {
                         Text("Nothing logged yet.")
                         Text("Add food from the Food tab.")
@@ -40,7 +51,36 @@ struct TodayView: View {
                     }
                 }
             }
-            .navigationTitle("Today")
+            .navigationTitle(dateLabel)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        withAnimation {
+                            selectedDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate)!
+                        }
+                    } label: {
+                        Image(systemName: "chevron.left")
+                    }
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        withAnimation {
+                            selectedDate = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate)!
+                        }
+                    } label: {
+                        Image(systemName: "chevron.right")
+                    }
+                    .disabled(isToday)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    if !isToday {
+                        Button("Today") {
+                            withAnimation { selectedDate = Date() }
+                        }
+                        .buttonStyle(.automatic)
+                    }
+                }
+            }
         }
     }
     
@@ -58,11 +98,11 @@ struct TodayView: View {
     
     private func deleteConsumptions(at offsets: IndexSet) {
         for index in offsets {
-            context.delete(todayConsumptions[index])
+            context.delete(dateConsumptions[index])
         }
     }
 }
 
 #Preview {
-    TodayView()
+    TodayView(selectedDate: .constant(Date()))
 }

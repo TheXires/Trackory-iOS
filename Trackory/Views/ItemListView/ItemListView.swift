@@ -12,8 +12,19 @@ struct ItemListView: View {
     @Environment(\.modelContext) private var context
     @State private var searchTerm: String = ""
     @State private var isPresented: Bool = false
+    @Binding var selectedDate: Date
     
     @Query private var items: [Item]
+    
+    private var isToday: Bool {
+        Calendar.current.isDateInToday(selectedDate)
+    }
+    
+    private var dateLabel: String {
+        if isToday { return "Today" }
+        if Calendar.current.isDateInYesterday(selectedDate) { return "Yesterday" }
+        return selectedDate.formatted(.dateTime.day().month(.abbreviated).year())
+    }
     
     var filteredItems: [Item] {
         let lowercasedSearchTerm = searchTerm.lowercased()
@@ -26,9 +37,25 @@ struct ItemListView: View {
     var body: some View {
         NavigationStack {
             List {
+                if !isToday {
+                    Section {
+                        HStack {
+                            Image(systemName: "calendar.badge.clock")
+                                .foregroundStyle(.orange)
+                            Text("Adding for **\(dateLabel)**")
+                                .font(.subheadline)
+                            Spacer()
+                            Button("Today") {
+                                withAnimation { selectedDate = Date() }
+                            }
+                            .font(.caption)
+                            .buttonStyle(.bordered)
+                        }
+                    }
+                }
                 ForEach(filteredItems) { item in
                     NavigationLink(value: item) {
-                        ItemListRow(item: item)
+                        ItemListRow(item: item, selectedDate: $selectedDate)
                     }
                 }
             }
@@ -64,5 +91,5 @@ struct ItemListView: View {
 }
 
 #Preview {
-    ItemListView()
+    ItemListView(selectedDate: .constant(Date()))
 }
