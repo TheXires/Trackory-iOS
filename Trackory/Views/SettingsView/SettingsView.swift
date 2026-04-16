@@ -14,11 +14,19 @@ struct SettingsView: View {
         // @Observable braucht @Bindable für Bindings in Views
         @Bindable var settings = settings
         
-        NavigationView {
+        NavigationStack {
             List {
                 Section(header: Text("Calorie Target")) {
-                    TextField("2100", value: $settings.calorieTarget, format: .number)
-                        .keyboardType(.decimalPad)
+                    NavigationLink {
+                        CalorieTargetEditView(calorieTarget: $settings.calorieTarget)
+                    } label: {
+                        HStack {
+                            Text("Daily Target")
+                            Spacer()
+                            Text("\(Int(settings.calorieTarget)) kcal")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                 }
                 Section(header: Text("Appearance")) {
                     Picker("Design", selection: $settings.design) {
@@ -30,7 +38,33 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
-            .scrollDismissesKeyboard(.immediately)
+        }
+    }
+}
+
+struct CalorieTargetEditView: View {
+    @Binding var calorieTarget: Float
+    @State private var draft: String = ""
+    @FocusState private var isFocused: Bool
+    
+    var body: some View {
+        List {
+            Section(footer: Text("Set your daily calorie target in kcal.")) {
+                TextField("e.g. 2100", text: $draft)
+                    .keyboardType(.numberPad)
+                    .focused($isFocused)
+            }
+        }
+        .navigationTitle("Calorie Target")
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            draft = "\(Int(calorieTarget))"
+            isFocused = true
+        }
+        .onChange(of: draft) { _, newValue in
+            if let val = Float(newValue), val > 0 {
+                calorieTarget = val
+            }
         }
     }
 }
