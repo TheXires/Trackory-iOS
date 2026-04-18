@@ -9,9 +9,15 @@ import SwiftUI
 import Observation
 
 enum UserDefaultsKey: String {
-    case calorieTarget = "calorieTarget"
-    case colorScheme = "colorScheme"
-    case language = "language"
+    case calorieTarget
+    case colorScheme
+    case language
+    case calcSex
+    case calcAge
+    case calcWeight
+    case calcHeight
+    case calcActivity
+    case calcGoal
 }
 
 enum Design: String, CaseIterable, Codable {
@@ -31,11 +37,35 @@ class AppSettings {
     var language: AppLanguage {
         didSet { save(language, for: .language) }
     }
+    var calcSex: String {
+        didSet { UserDefaults.standard.set(calcSex, forKey: UserDefaultsKey.calcSex.rawValue) }
+    }
+    var calcAge: String {
+        didSet { UserDefaults.standard.set(calcAge, forKey: UserDefaultsKey.calcAge.rawValue) }
+    }
+    var calcWeight: String {
+        didSet { UserDefaults.standard.set(calcWeight, forKey: UserDefaultsKey.calcWeight.rawValue) }
+    }
+    var calcHeight: String {
+        didSet { UserDefaults.standard.set(calcHeight, forKey: UserDefaultsKey.calcHeight.rawValue) }
+    }
+    var calcActivity: String {
+        didSet { UserDefaults.standard.set(calcActivity, forKey: UserDefaultsKey.calcActivity.rawValue) }
+    }
+    var calcGoal: String {
+        didSet { UserDefaults.standard.set(calcGoal, forKey: UserDefaultsKey.calcGoal.rawValue) }
+    }
     
     init() {
         calorieTarget = AppSettings.load(for: .calorieTarget, default: 2100)
         design        = AppSettings.load(for: .colorScheme,   default: .system)
         language      = AppSettings.load(for: .language,      default: .system)
+        calcSex       = UserDefaults.standard.string(forKey: UserDefaultsKey.calcSex.rawValue) ?? "male"
+        calcAge       = UserDefaults.standard.string(forKey: UserDefaultsKey.calcAge.rawValue) ?? ""
+        calcWeight    = UserDefaults.standard.string(forKey: UserDefaultsKey.calcWeight.rawValue) ?? ""
+        calcHeight    = UserDefaults.standard.string(forKey: UserDefaultsKey.calcHeight.rawValue) ?? ""
+        calcActivity  = UserDefaults.standard.string(forKey: UserDefaultsKey.calcActivity.rawValue) ?? "sedentary"
+        calcGoal      = UserDefaults.standard.string(forKey: UserDefaultsKey.calcGoal.rawValue) ?? "maintain"
     }
     
     // MARK: - Persistence
