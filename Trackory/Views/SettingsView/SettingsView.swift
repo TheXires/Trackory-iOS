@@ -40,7 +40,7 @@ struct SettingsView: View {
                     NavigationLink {
                         CalorieCalculatorView(calorieTarget: $settings.calorieTarget)
                     } label: {
-                        Label("Calorie Calculator", systemImage: "function")
+                        Text("Calorie Calculator")
                     }
                 }
                 Section(header: Text("Appearance")) {
