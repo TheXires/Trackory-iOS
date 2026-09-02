@@ -9,21 +9,39 @@ import SwiftUI
 import SwiftData
 import UniformTypeIdentifiers
 
+// Wraps the full export payload; each field is optional so partial exports work.
+struct TrackoryExportDTO: Codable {
+    var items: [ItemDTO]?
+    var history: [ConsumptionDTO]?
+}
+
+enum ExportScope {
+    case items, history, both
+}
+
+enum ImportScope {
+    case items, history, both
+}
+
 struct SettingsView: View {
     @Environment(AppSettings.self) private var settings
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
-    
+    @Query private var consumptions: [Consumption]
+
+    @State private var showExportScopeSheet = false
+    @State private var showImportScopeSheet = false
     @State private var showExporter = false
     @State private var showImporter = false
     @State private var importResult: ImportResult?
     @State private var showImportAlert = false
     @State private var exportDocument: JSONDocument?
-    
+    @State private var pendingImportScope: ImportScope = .both
+
     var body: some View {
         // @Observable braucht @Bindable für Bindings in Views
         @Bindable var settings = settings
-        
+
         NavigationStack {
             List {
                 Section(header: Text("Calorie Target")) {
@@ -61,67 +79,183 @@ struct SettingsView: View {
                 }
                 Section(header: Text("Data")) {
                     Button {
-                        let dtos = items.map { ItemDTO(from: $0) }
-                        if let data = try? JSONEncoder().encode(dtos) {
-                            exportDocument = JSONDocument(data: data)
-                            showExporter = true
-                        }
+                        showExportScopeSheet = true
                     } label: {
-                        Label("Export Items", systemImage: "square.and.arrow.up")
+                        Label("Export Data", systemImage: "square.and.arrow.up")
                     }
                     Button {
-                        showImporter = true
+                        showImportScopeSheet = true
                     } label: {
-                        Label("Import Items", systemImage: "square.and.arrow.down")
+                        Label("Import Data", systemImage: "square.and.arrow.down")
                     }
                 }
             }
             .navigationTitle("Settings")
+            // Export scope selection
+            .confirmationDialog("Export Data", isPresented: $showExportScopeSheet, titleVisibility: .visible) {
+                Button("Export Items") { prepareExport(scope: .items) }
+                Button("Export History") { prepareExport(scope: .history) }
+                Button("Export Items & History") { prepareExport(scope: .both) }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("Choose what to export")
+            }
+            // Import scope selection
+            .confirmationDialog("Import Data", isPresented: $showImportScopeSheet, titleVisibility: .visible) {
+                Button("Import Items") {
+                    pendingImportScope = .items
+                    showImporter = true
+                }
+                Button("Import History") {
+                    pendingImportScope = .history
+                    showImporter = true
+                }
+                Button("Import Items & History") {
+                    pendingImportScope = .both
+                    showImporter = true
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("Choose what to import")
+            }
             .fileExporter(
                 isPresented: $showExporter,
                 document: exportDocument,
                 contentType: .json,
-                defaultFilename: "trackory_items.json"
+                defaultFilename: "trackory_export.json"
             ) { _ in }
-                .fileImporter(
-                    isPresented: $showImporter,
-                    allowedContentTypes: [.json]
-                ) { result in
-                    guard let url = try? result.get(),
-                          url.startAccessingSecurityScopedResource() else { return }
-                    defer { url.stopAccessingSecurityScopedResource() }
-                    guard let data = try? Data(contentsOf: url),
-                          let dtos = try? JSONDecoder().decode([ItemDTO].self, from: data) else { return }
-                    
-                    var added = 0
-                    var skipped = 0
-                    for dto in dtos {
-                        let isDuplicate = items.contains { dto.matches($0) }
-                        if isDuplicate {
-                            skipped += 1
-                        } else {
-                            let newItem = Item(
-                                calories: dto.calories,
-                                carbohydrates: dto.carbohydrates,
-                                fat: dto.fat,
-                                name: dto.name,
-                                protein: dto.protein
-                            )
-                            modelContext.insert(newItem)
-                            added += 1
-                        }
-                    }
-                    importResult = ImportResult(added: added, skipped: skipped)
-                    showImportAlert = true
+            .fileImporter(
+                isPresented: $showImporter,
+                allowedContentTypes: [.json]
+            ) { result in
+                guard let url = try? result.get(),
+                      url.startAccessingSecurityScopedResource() else { return }
+                defer { url.stopAccessingSecurityScopedResource() }
+                guard let data = try? Data(contentsOf: url) else { return }
+
+                handleImport(data: data, scope: pendingImportScope)
+            }
+            .alert("Import Complete", isPresented: $showImportAlert) {
+                Button("OK") { }
+            } message: {
+                if let r = importResult {
+                    Text(importSummary(r))
                 }
-                .alert("Import Complete", isPresented: $showImportAlert) {
-                    Button("OK") { }
-                } message: {
-                    if let r = importResult {
-                        Text("\(r.added) items added, \(r.skipped) duplicates skipped.")
-                    }
-                }
+            }
         }
+    }
+
+    // MARK: - Export
+
+    private func prepareExport(scope: ExportScope) {
+        let dto: TrackoryExportDTO
+        switch scope {
+        case .items:
+            dto = TrackoryExportDTO(items: items.map { ItemDTO(from: $0) }, history: nil)
+        case .history:
+            dto = TrackoryExportDTO(items: nil, history: consumptions.map { ConsumptionDTO(from: $0) })
+        case .both:
+            dto = TrackoryExportDTO(
+                items: items.map { ItemDTO(from: $0) },
+                history: consumptions.map { ConsumptionDTO(from: $0) }
+            )
+        }
+        if let data = try? JSONEncoder().encode(dto) {
+            exportDocument = JSONDocument(data: data)
+            showExporter = true
+        }
+    }
+
+    // MARK: - Import
+
+    private func handleImport(data: Data, scope: ImportScope) {
+        // Try new combined format first, fall back to legacy [ItemDTO] array.
+        var addedItems = 0
+        var skippedItems = 0
+        var addedHistory = 0
+        var skippedHistory = 0
+
+        if let dto = try? JSONDecoder().decode(TrackoryExportDTO.self, from: data) {
+            if scope != .history, let dtoItems = dto.items {
+                for item in dtoItems {
+                    if items.contains(where: { item.matches($0) }) {
+                        skippedItems += 1
+                    } else {
+                        modelContext.insert(Item(
+                            calories: item.calories,
+                            carbohydrates: item.carbohydrates,
+                            fat: item.fat,
+                            name: item.name,
+                            protein: item.protein
+                        ))
+                        addedItems += 1
+                    }
+                }
+            }
+            if scope != .items, let dtoHistory = dto.history {
+                for entry in dtoHistory {
+                    let isDuplicate = consumptions.contains {
+                        $0.itemId == entry.itemId &&
+                        Calendar.current.isDate($0.date, equalTo: entry.date, toGranularity: .minute) &&
+                        $0.quantity == entry.quantity
+                    }
+                    if isDuplicate {
+                        skippedHistory += 1
+                    } else {
+                        modelContext.insert(Consumption(
+                            calories: entry.calories,
+                            carbohydrates: entry.carbohydrates,
+                            date: entry.date,
+                            fat: entry.fat,
+                            itemId: entry.itemId,
+                            name: entry.name,
+                            protein: entry.protein,
+                            quantity: entry.quantity
+                        ))
+                        addedHistory += 1
+                    }
+                }
+            }
+        } else if scope != .history,
+                  let legacyItems = try? JSONDecoder().decode([ItemDTO].self, from: data) {
+            // Legacy export: plain [ItemDTO] array
+            for item in legacyItems {
+                if items.contains(where: { item.matches($0) }) {
+                    skippedItems += 1
+                } else {
+                    modelContext.insert(Item(
+                        calories: item.calories,
+                        carbohydrates: item.carbohydrates,
+                        fat: item.fat,
+                        name: item.name,
+                        protein: item.protein
+                    ))
+                    addedItems += 1
+                }
+            }
+        }
+
+        importResult = ImportResult(
+            addedItems: addedItems,
+            skippedItems: skippedItems,
+            addedHistory: addedHistory,
+            skippedHistory: skippedHistory
+        )
+        showImportAlert = true
+    }
+
+    private func importSummary(_ r: ImportResult) -> String {
+        var parts: [String] = []
+        if r.addedItems > 0 || r.skippedItems > 0 {
+            parts.append(String(format: NSLocalizedString("%lld items added, %lld duplicates skipped.", comment: ""), r.addedItems, r.skippedItems))
+        }
+        if r.addedHistory > 0 || r.skippedHistory > 0 {
+            parts.append(String(format: NSLocalizedString("%lld history entries added, %lld duplicates skipped.", comment: ""), r.addedHistory, r.skippedHistory))
+        }
+        if parts.isEmpty {
+            return NSLocalizedString("Nothing was imported.", comment: "")
+        }
+        return parts.joined(separator: "\n")
     }
 }
 
@@ -129,7 +263,7 @@ struct CalorieTargetEditView: View {
     @Binding var calorieTarget: Float
     @State private var draft: String = ""
     @FocusState private var isFocused: Bool
-    
+
     var body: some View {
         List {
             Section(footer: Text("Set your daily calorie target in kcal.")) {
@@ -158,23 +292,29 @@ struct CalorieTargetEditView: View {
 }
 
 struct ImportResult {
-    let added: Int
-    let skipped: Int
+    let addedItems: Int
+    let skippedItems: Int
+    let addedHistory: Int
+    let skippedHistory: Int
+
+    // Backwards compatibility
+    var added: Int { addedItems }
+    var skipped: Int { skippedItems }
 }
 
 struct JSONDocument: FileDocument {
     static var readableContentTypes: [UTType] { [.json] }
-    
+
     var data: Data
-    
+
     init(data: Data) {
         self.data = data
     }
-    
+
     init(configuration: ReadConfiguration) throws {
         data = configuration.file.regularFileContents ?? Data()
     }
-    
+
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
         FileWrapper(regularFileWithContents: data)
     }
