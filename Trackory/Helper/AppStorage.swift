@@ -10,6 +10,9 @@ import Observation
 
 enum UserDefaultsKey: String {
     case calorieTarget
+    case proteinTarget
+    case carbsTarget
+    case fatTarget
     case colorScheme
     case language
     case calcSex
@@ -30,6 +33,15 @@ enum Design: String, CaseIterable, Codable {
 class AppSettings {
     var calorieTarget: Float {
         didSet { save(calorieTarget, for: .calorieTarget) }
+    }
+    var proteinTarget: Float {
+        didSet { save(proteinTarget, for: .proteinTarget) }
+    }
+    var carbsTarget: Float {
+        didSet { save(carbsTarget, for: .carbsTarget) }
+    }
+    var fatTarget: Float {
+        didSet { save(fatTarget, for: .fatTarget) }
     }
     var design: Design {
         didSet { save(design, for: .colorScheme) }
@@ -57,8 +69,11 @@ class AppSettings {
     }
     
     init() {
-        calorieTarget = AppSettings.load(for: .calorieTarget, default: 2100)
-        design        = AppSettings.load(for: .colorScheme,   default: .system)
+        calorieTarget  = AppSettings.load(for: .calorieTarget, default: 2100)
+        proteinTarget  = AppSettings.load(for: .proteinTarget, default: 130)
+        carbsTarget    = AppSettings.load(for: .carbsTarget,   default: 263)
+        fatTarget      = AppSettings.load(for: .fatTarget,     default: 58)
+        design         = AppSettings.load(for: .colorScheme,   default: .system)
         language      = AppSettings.load(for: .language,      default: .system)
         calcSex       = UserDefaults.standard.string(forKey: UserDefaultsKey.calcSex.rawValue) ?? "male"
         calcAge       = UserDefaults.standard.string(forKey: UserDefaultsKey.calcAge.rawValue) ?? ""

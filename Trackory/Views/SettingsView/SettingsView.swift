@@ -44,16 +44,16 @@ struct SettingsView: View {
 
         NavigationStack {
             List {
-                Section(header: Text("Calorie Target")) {
+                Section(header: Text("Nutrition Targets")) {
                     NavigationLink {
-                        CalorieTargetEditView(calorieTarget: $settings.calorieTarget)
+                        NutritionTargetsEditView(
+                            calorieTarget: $settings.calorieTarget,
+                            proteinTarget: $settings.proteinTarget,
+                            carbsTarget: $settings.carbsTarget,
+                            fatTarget: $settings.fatTarget
+                        )
                     } label: {
-                        HStack {
-                            Text("Daily Target")
-                            Spacer()
-                            Text("\(Int(settings.calorieTarget)) kcal")
-                                .foregroundStyle(.secondary)
-                        }
+                        Text("Daily Target")
                     }
                     NavigationLink {
                         CalorieCalculatorView(calorieTarget: $settings.calorieTarget)
@@ -257,30 +257,65 @@ struct SettingsView: View {
     }
 }
 
-struct CalorieTargetEditView: View {
+struct NutritionTargetsEditView: View {
     @Binding var calorieTarget: Float
-    @State private var draft: String = ""
-    @FocusState private var isFocused: Bool
+    @Binding var proteinTarget: Float
+    @Binding var carbsTarget: Float
+    @Binding var fatTarget: Float
+
+    @State private var calorieDraft: String = ""
+    @State private var proteinDraft: String = ""
+    @State private var carbsDraft: String = ""
+    @State private var fatDraft: String = ""
 
     var body: some View {
         List {
-            Section(footer: Text("Set your daily calorie target in kcal.")) {
-                TextField("e.g. 2100", text: $draft)
+            Section(header: Text("Calories"), footer: Text("Daily calorie target in kcal.")) {
+                TextField("e.g. 2100", text: $calorieDraft)
                     .keyboardType(.numberPad)
-                    .focused($isFocused)
+            }
+            Section(header: Text("Macronutrients"), footer: Text("Daily targets in grams.")) {
+                HStack {
+                    Text("Protein")
+                    Spacer()
+                    TextField("e.g. 130", text: $proteinDraft)
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 80)
+                    Text("g").foregroundStyle(.secondary)
+                }
+                HStack {
+                    Text("Carbohydrates")
+                    Spacer()
+                    TextField("e.g. 263", text: $carbsDraft)
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 80)
+                    Text("g").foregroundStyle(.secondary)
+                }
+                HStack {
+                    Text("Fat")
+                    Spacer()
+                    TextField("e.g. 58", text: $fatDraft)
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 80)
+                    Text("g").foregroundStyle(.secondary)
+                }
             }
         }
-        .navigationTitle("Calorie Target")
+        .navigationTitle("Daily Target")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            draft = "\(Int(calorieTarget))"
-            isFocused = true
+            calorieDraft = "\(Int(calorieTarget))"
+            proteinDraft = "\(Int(proteinTarget))"
+            carbsDraft   = "\(Int(carbsTarget))"
+            fatDraft     = "\(Int(fatTarget))"
         }
-        .onChange(of: draft) { _, newValue in
-            if let val = Float(newValue), val > 0 {
-                calorieTarget = val
-            }
-        }
+        .onChange(of: calorieDraft) { _, v in if let f = Float(v), f > 0 { calorieTarget = f } }
+        .onChange(of: proteinDraft) { _, v in if let f = Float(v), f > 0 { proteinTarget = f } }
+        .onChange(of: carbsDraft)   { _, v in if let f = Float(v), f > 0 { carbsTarget   = f } }
+        .onChange(of: fatDraft)     { _, v in if let f = Float(v), f > 0 { fatTarget     = f } }
     }
 }
 

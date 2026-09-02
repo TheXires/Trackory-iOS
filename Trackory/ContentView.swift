@@ -39,7 +39,7 @@ struct ContentView: View {
         }
         .preferredColorScheme(settings.design == .light ? .light : settings.design == .dark ? .dark : nil)
         .tabViewBottomAccessory(isEnabled: selectedTab == 0) {
-            ProgressBarView()
+            ProgressBarView(selectedDate: selectedDate)
         }
     }
 }
