@@ -305,12 +305,62 @@
         }
       }
     },
+    "Choose what to export" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was möchtest du exportieren?"
+          }
+        }
+      }
+    },
+    "Choose what to import" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was möchtest du importieren?"
+          }
+        }
+      }
+    },
+    "Export Data" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daten exportieren"
+          }
+        }
+      }
+    },
+    "Export History" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf exportieren"
+          }
+        }
+      }
+    },
     "Export Items" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Einträge exportieren"
+          }
+        }
+      }
+    },
+    "Export Items & History" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einträge & Verlauf exportieren"
           }
         }
       }
@@ -385,12 +435,62 @@
         }
       }
     },
+    "Import Data" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daten importieren"
+          }
+        }
+      }
+    },
+    "Import History" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf importieren"
+          }
+        }
+      }
+    },
     "Import Items" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Einträge importieren"
+          }
+        }
+      }
+    },
+    "Import Items & History" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einträge & Verlauf importieren"
+          }
+        }
+      }
+    },
+    "%lld history entries added, %lld duplicates skipped." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Verlaufseinträge hinzugefügt, %2$lld Duplikate übersprungen."
+          }
+        }
+      }
+    },
+    "Nothing was imported." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es wurde nichts importiert."
           }
         }
       }

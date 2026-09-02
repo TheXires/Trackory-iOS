@@ -83,41 +83,39 @@ struct SettingsView: View {
                     } label: {
                         Label("Export Data", systemImage: "square.and.arrow.up")
                     }
+                    .confirmationDialog("Export Data", isPresented: $showExportScopeSheet, titleVisibility: .visible) {
+                        Button("Export Items") { prepareExport(scope: .items) }
+                        Button("Export History") { prepareExport(scope: .history) }
+                        Button("Export Items & History") { prepareExport(scope: .both) }
+                        Button("Cancel", role: .cancel) { }
+                    } message: {
+                        Text("Choose what to export")
+                    }
                     Button {
                         showImportScopeSheet = true
                     } label: {
                         Label("Import Data", systemImage: "square.and.arrow.down")
                     }
+                    .confirmationDialog("Import Data", isPresented: $showImportScopeSheet, titleVisibility: .visible) {
+                        Button("Import Items") {
+                            pendingImportScope = .items
+                            showImporter = true
+                        }
+                        Button("Import History") {
+                            pendingImportScope = .history
+                            showImporter = true
+                        }
+                        Button("Import Items & History") {
+                            pendingImportScope = .both
+                            showImporter = true
+                        }
+                        Button("Cancel", role: .cancel) { }
+                    } message: {
+                        Text("Choose what to import")
+                    }
                 }
             }
             .navigationTitle("Settings")
-            // Export scope selection
-            .confirmationDialog("Export Data", isPresented: $showExportScopeSheet, titleVisibility: .visible) {
-                Button("Export Items") { prepareExport(scope: .items) }
-                Button("Export History") { prepareExport(scope: .history) }
-                Button("Export Items & History") { prepareExport(scope: .both) }
-                Button("Cancel", role: .cancel) { }
-            } message: {
-                Text("Choose what to export")
-            }
-            // Import scope selection
-            .confirmationDialog("Import Data", isPresented: $showImportScopeSheet, titleVisibility: .visible) {
-                Button("Import Items") {
-                    pendingImportScope = .items
-                    showImporter = true
-                }
-                Button("Import History") {
-                    pendingImportScope = .history
-                    showImporter = true
-                }
-                Button("Import Items & History") {
-                    pendingImportScope = .both
-                    showImporter = true
-                }
-                Button("Cancel", role: .cancel) { }
-            } message: {
-                Text("Choose what to import")
-            }
             .fileExporter(
                 isPresented: $showExporter,
                 document: exportDocument,
