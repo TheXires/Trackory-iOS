@@ -13,18 +13,18 @@ struct EditItemView: View {
     var item: Item
     
     @State private var name: String
-    @State private var calories: Int?
-    @State private var carbohydrates: Int?
-    @State private var fat: Int?
-    @State private var protein: Int?
+    @State private var calories: Double?
+    @State private var carbohydrates: Double?
+    @State private var fat: Double?
+    @State private var protein: Double?
     
     init(item: Item) {
         self.item = item
-        _name         = State(initialValue: item.name)
-        _calories     = State(initialValue: item.calories)
+        _name          = State(initialValue: item.name)
+        _calories      = State(initialValue: item.calories)
         _carbohydrates = State(initialValue: item.carbohydrates)
-        _fat          = State(initialValue: item.fat)
-        _protein      = State(initialValue: item.protein)
+        _fat           = State(initialValue: item.fat)
+        _protein       = State(initialValue: item.protein)
     }
     
     var body: some View {
@@ -60,6 +60,6 @@ struct EditItemView: View {
 
 #Preview {
     EditItemView(
-        item: Item(calories: 100, carbohydrates: 20, fat: 5, name: "Toast", protein: 3)
+        item: Item(calories: 100, carbohydrates: 20, fat: 5.3, name: "Toast", protein: 3.2)
     )
 }

@@ -13,10 +13,10 @@ struct ItemDetailNutritionView: View {
     var body: some View {
         List {
             Section {
-                ItemDetailRow(title: String(localized: "Calories"), content: "\(item.calories)")
-                ItemDetailRow(title: String(localized: "Carbohydrates"), content: "\(item.carbohydrates)")
-                ItemDetailRow(title: String(localized: "Protein"), content: "\(item.protein)")
-                ItemDetailRow(title: String(localized: "Fat"), content: "\(item.fat)")
+                ItemDetailRow(title: String(localized: "Calories"), content: "\(item.calories.formatted(.number.precision(.fractionLength(0...1)))) kcal")
+                ItemDetailRow(title: String(localized: "Carbohydrates"), content: "\(item.carbohydrates.formatted(.number.precision(.fractionLength(0...1)))) g")
+                ItemDetailRow(title: String(localized: "Protein"), content: "\(item.protein.formatted(.number.precision(.fractionLength(0...1)))) g")
+                ItemDetailRow(title: String(localized: "Fat"), content: "\(item.fat.formatted(.number.precision(.fractionLength(0...1)))) g")
             }
         }
         .listStyle(.plain)

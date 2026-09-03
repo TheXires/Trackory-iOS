@@ -12,24 +12,42 @@ import SwiftData
 
 struct ItemFormView: View {
     @FocusState private var isFieldFocused: Bool
-    
+
     @Binding var name: String
-    @Binding var calories: Int?
-    @Binding var carbohydrates: Int?
-    @Binding var fat: Int?
-    @Binding var protein: Int?
-    
+    @Binding var calories: Double?
+    @Binding var carbohydrates: Double?
+    @Binding var fat: Double?
+    @Binding var protein: Double?
+
     var body: some View {
         Form {
-            TextField("Name", text: $name)
-                .focused($isFieldFocused)
-            NumberField(name: String(localized: "Calories"), value: $calories)
-            NumberField(name: String(localized: "Carbohydrates"), value: $carbohydrates)
-            NumberField(name: String(localized: "Fat"), value: $fat)
-            NumberField(name: String(localized: "Protein"), value: $protein)
+            Section {
+                TextField("Name", text: $name)
+                    .focused($isFieldFocused)
+            }
+            Section {
+                inlineField(label: String(localized: "Calories"), value: $calories, unit: "kcal")
+                inlineField(label: String(localized: "Protein"), value: $protein, unit: "g")
+                inlineField(label: String(localized: "Carbohydrates"), value: $carbohydrates, unit: "g")
+                inlineField(label: String(localized: "Fat"), value: $fat, unit: "g")
+            }
         }
         .onAppear {
             isFieldFocused = true
+        }
+    }
+
+    @ViewBuilder
+    private func inlineField(label: String, value: Binding<Double?>, unit: String) -> some View {
+        HStack {
+            Text(label)
+            Spacer()
+            TextField("0", value: value, format: .number)
+                .keyboardType(.decimalPad)
+                .multilineTextAlignment(.trailing)
+                .frame(width: 80)
+            Text(unit)
+                .foregroundStyle(.secondary)
         }
     }
 }
@@ -39,13 +57,13 @@ struct ItemFormView: View {
 struct CreateItemView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) private var context
-    
+
     @State private var name: String = ""
-    @State private var calories: Int?
-    @State private var carbohydrates: Int?
-    @State private var fat: Int?
-    @State private var protein: Int?
-    
+    @State private var calories: Double?
+    @State private var carbohydrates: Double?
+    @State private var fat: Double?
+    @State private var protein: Double?
+
     var body: some View {
         NavigationStack {
             ItemFormView(

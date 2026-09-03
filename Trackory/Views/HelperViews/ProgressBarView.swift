@@ -23,7 +23,7 @@ struct ProgressBarView: View {
     }
 
     private var totalCalories: Float {
-        dayConsumptions.reduce(0) { $0 + Float($1.calories * $1.quantity) }
+        dayConsumptions.reduce(0) { $0 + Float($1.calories * Double($1.quantity)) }
     }
 
     private var remainingCalories: Float {
@@ -70,19 +70,19 @@ struct MacroDetailView: View {
     }
 
     private var totalCalories: Float {
-        dayConsumptions.reduce(0) { $0 + Float($1.calories * $1.quantity) }
+        dayConsumptions.reduce(0) { $0 + Float($1.calories * Double($1.quantity)) }
     }
 
     private var totalProtein: Float {
-        dayConsumptions.reduce(0) { $0 + Float($1.protein * $1.quantity) }
+        dayConsumptions.reduce(0) { $0 + Float($1.protein * Double($1.quantity)) }
     }
 
     private var totalCarbs: Float {
-        dayConsumptions.reduce(0) { $0 + Float($1.carbohydrates * $1.quantity) }
+        dayConsumptions.reduce(0) { $0 + Float($1.carbohydrates * Double($1.quantity)) }
     }
 
     private var totalFat: Float {
-        dayConsumptions.reduce(0) { $0 + Float($1.fat * $1.quantity) }
+        dayConsumptions.reduce(0) { $0 + Float($1.fat * Double($1.quantity)) }
     }
 
     private var remainingCalories: Float {

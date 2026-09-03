@@ -9,13 +9,13 @@ import Foundation
 import SwiftData
 
 struct ConsumptionDTO: Codable {
-    var calories: Int
-    var carbohydrates: Int
+    var calories: Double
+    var carbohydrates: Double
     var date: Date
-    var fat: Int
+    var fat: Double
     var itemId: UUID
     var name: String
-    var protein: Int
+    var protein: Double
     var quantity: Int
 
     init(from consumption: Consumption) {
@@ -33,22 +33,22 @@ struct ConsumptionDTO: Codable {
 @Model
 class Consumption: Identifiable, Hashable {
     var id = UUID()
-    var calories: Int
-    var carbohydrates: Int
+    var calories: Double
+    var carbohydrates: Double
     var date: Date
-    var fat: Int
+    var fat: Double
     var itemId: UUID
     var name: String
-    var protein: Int
+    var protein: Double
     var quantity: Int
     
-    init(calories: Int,
-         carbohydrates: Int,
+    init(calories: Double,
+         carbohydrates: Double,
          date: Date,
-         fat: Int,
+         fat: Double,
          itemId: UUID,
          name: String,
-         protein: Int,
+         protein: Double,
          quantity: Int) {
         self.calories = calories
         self.carbohydrates = carbohydrates

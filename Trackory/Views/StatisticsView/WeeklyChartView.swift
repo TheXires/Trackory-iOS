@@ -101,7 +101,7 @@ struct WeeklyChartView: View {
     private func caloriesFor(start: Date, end: Date) -> Float {
         consumptions
             .filter { $0.date >= start && $0.date < end }
-            .reduce(0) { $0 + Float($1.calories * $1.quantity) }
+            .reduce(0) { $0 + Float($1.calories * Double($1.quantity)) }
     }
     
     // MARK: Chart axis config

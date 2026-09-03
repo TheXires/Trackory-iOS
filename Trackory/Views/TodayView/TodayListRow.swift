@@ -20,7 +20,7 @@ struct TodayListRow: View {
                     .lineLimit(1)
                     .padding(.trailing)
                 
-                Text("\(consumption.calories * consumption.quantity) kcal")
+                Text("\((consumption.calories * Double(consumption.quantity)).formatted(.number.precision(.fractionLength(0...1)))) kcal")
                     .font(.caption)
                     .fontWeight(.light)
             }
