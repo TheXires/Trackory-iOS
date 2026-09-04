@@ -35,6 +35,7 @@ struct TodayListRow: View {
                         .frame(width: 20, height: 20)
                 }
                 .buttonStyle(.bordered)
+                .accessibilityLabel(Text("Decrease quantity"))
                 
                 Text("\(consumption.quantity)")
                     .frame(width: 25)
@@ -46,6 +47,7 @@ struct TodayListRow: View {
                         .frame(width: 20, height: 20)
                 }
                 .buttonStyle(.bordered)
+                .accessibilityLabel(Text("Increase quantity"))
             }
         }
         .padding(8)

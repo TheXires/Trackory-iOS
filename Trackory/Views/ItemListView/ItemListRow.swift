@@ -31,6 +31,7 @@ struct ItemListRow: View {
                     .frame(width: 20, height: 20)
             }
             .buttonStyle(.bordered)
+            .accessibilityLabel(Text("Add \(item.name)"))
             // Stop the button tap from also triggering the NavigationLink
             .simultaneousGesture(TapGesture())
         }

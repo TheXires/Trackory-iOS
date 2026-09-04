@@ -12,7 +12,18 @@ import SwiftData
 struct TrackoryApp: App {
     @State private var settings = AppSettings()
     @State private var flyCoordinator = FlyToTabCoordinator()
-    
+    let modelContainer: ModelContainer
+
+    init() {
+        let schema = Schema(SchemaV1.models)
+        let config = ModelConfiguration(schema: schema)
+        do {
+            modelContainer = try ModelContainer(for: schema, migrationPlan: TrackoryMigrationPlan.self, configurations: [config])
+        } catch {
+            fatalError("Failed to create ModelContainer: \(error)")
+        }
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -21,10 +32,6 @@ struct TrackoryApp: App {
                 .environment(\.locale, settings.language.resolvedLocale)
                 .flyToTabAnimationOverlay(coordinator: flyCoordinator)
         }
-        .modelContainer(for: [Item.self, Consumption.self])
-    }
-    
-    init() {
-        print(URL.applicationSupportDirectory.path(percentEncoded: false))
+        .modelContainer(modelContainer)
     }
 }

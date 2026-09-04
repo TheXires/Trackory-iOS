@@ -27,6 +27,14 @@ enum Design: String, CaseIterable, Codable {
     case system
     case light
     case dark
+
+    var displayName: LocalizedStringKey {
+        switch self {
+        case .system: "System"
+        case .light:  "Light"
+        case .dark:   "Dark"
+        }
+    }
 }
 
 @Observable
@@ -50,37 +58,37 @@ class AppSettings {
         didSet { save(language, for: .language) }
     }
     var calcSex: String {
-        didSet { UserDefaults.standard.set(calcSex, forKey: UserDefaultsKey.calcSex.rawValue) }
+        didSet { save(calcSex, for: .calcSex) }
     }
-    var calcAge: String {
-        didSet { UserDefaults.standard.set(calcAge, forKey: UserDefaultsKey.calcAge.rawValue) }
+    var calcAge: Double? {
+        didSet { save(calcAge, for: .calcAge) }
     }
-    var calcWeight: String {
-        didSet { UserDefaults.standard.set(calcWeight, forKey: UserDefaultsKey.calcWeight.rawValue) }
+    var calcWeight: Double? {
+        didSet { save(calcWeight, for: .calcWeight) }
     }
-    var calcHeight: String {
-        didSet { UserDefaults.standard.set(calcHeight, forKey: UserDefaultsKey.calcHeight.rawValue) }
+    var calcHeight: Double? {
+        didSet { save(calcHeight, for: .calcHeight) }
     }
     var calcActivity: String {
-        didSet { UserDefaults.standard.set(calcActivity, forKey: UserDefaultsKey.calcActivity.rawValue) }
+        didSet { save(calcActivity, for: .calcActivity) }
     }
     var calcGoal: String {
-        didSet { UserDefaults.standard.set(calcGoal, forKey: UserDefaultsKey.calcGoal.rawValue) }
+        didSet { save(calcGoal, for: .calcGoal) }
     }
-    
+
     init() {
-        calorieTarget  = AppSettings.load(for: .calorieTarget, default: 2100)
-        proteinTarget  = AppSettings.load(for: .proteinTarget, default: 130)
-        carbsTarget    = AppSettings.load(for: .carbsTarget,   default: 263)
-        fatTarget      = AppSettings.load(for: .fatTarget,     default: 58)
-        design         = AppSettings.load(for: .colorScheme,   default: .system)
+        calorieTarget = AppSettings.load(for: .calorieTarget, default: 2100)
+        proteinTarget = AppSettings.load(for: .proteinTarget, default: 130)
+        carbsTarget   = AppSettings.load(for: .carbsTarget,   default: 263)
+        fatTarget     = AppSettings.load(for: .fatTarget,     default: 58)
+        design        = AppSettings.load(for: .colorScheme,   default: .system)
         language      = AppSettings.load(for: .language,      default: .system)
-        calcSex       = UserDefaults.standard.string(forKey: UserDefaultsKey.calcSex.rawValue) ?? "male"
-        calcAge       = UserDefaults.standard.string(forKey: UserDefaultsKey.calcAge.rawValue) ?? ""
-        calcWeight    = UserDefaults.standard.string(forKey: UserDefaultsKey.calcWeight.rawValue) ?? ""
-        calcHeight    = UserDefaults.standard.string(forKey: UserDefaultsKey.calcHeight.rawValue) ?? ""
-        calcActivity  = UserDefaults.standard.string(forKey: UserDefaultsKey.calcActivity.rawValue) ?? "sedentary"
-        calcGoal      = UserDefaults.standard.string(forKey: UserDefaultsKey.calcGoal.rawValue) ?? "maintain"
+        calcSex       = AppSettings.load(for: .calcSex,       default: "male")
+        calcAge       = AppSettings.load(for: .calcAge,       default: nil)
+        calcWeight    = AppSettings.load(for: .calcWeight,    default: nil)
+        calcHeight    = AppSettings.load(for: .calcHeight,    default: nil)
+        calcActivity  = AppSettings.load(for: .calcActivity,  default: "sedentary")
+        calcGoal      = AppSettings.load(for: .calcGoal,      default: "maintain")
     }
     
     // MARK: - Persistence

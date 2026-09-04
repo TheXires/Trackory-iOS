@@ -55,8 +55,8 @@ struct TodayView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        withAnimation {
-                            selectedDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate)!
+                        if let newDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate) {
+                            withAnimation { selectedDate = newDate }
                         }
                     } label: {
                         Image(systemName: "chevron.left")
@@ -64,8 +64,8 @@ struct TodayView: View {
                 }
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        withAnimation {
-                            selectedDate = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate)!
+                        if let newDate = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate) {
+                            withAnimation { selectedDate = newDate }
                         }
                     } label: {
                         Image(systemName: "chevron.right")

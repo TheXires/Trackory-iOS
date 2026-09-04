@@ -37,7 +37,23 @@ struct WeeklyChartView: View {
     
     @State private var selectedRange: StatisticsRange = .week
     @State private var offset: Int = 0  // 0 = current, -1 = previous, etc.
-    
+
+    // MARK: Offset bounds
+
+    private var minimumOffset: Int {
+        guard let earliest = consumptions.min(by: { $0.date < $1.date }) else { return 0 }
+        let calendar = Calendar.current
+        switch selectedRange {
+        case .week:
+            return calendar.dateComponents([.weekOfYear], from: earliest.date, to: Date()).weekOfYear.map { -$0 } ?? 0
+        case .month:
+            return calendar.dateComponents([.month], from: earliest.date, to: Date()).month.map { -$0 } ?? 0
+        }
+    }
+
+    private var isCurrentPeriod: Bool { offset == 0 }
+    private var isEarliestPeriod: Bool { offset <= minimumOffset }
+
     // MARK: Period label
     
     private var periodLabel: String {
@@ -46,24 +62,28 @@ struct WeeklyChartView: View {
         
         switch selectedRange {
         case .week:
-            let endDate = calendar.date(byAdding: .weekOfYear, value: offset, to: today)!
-            let startDate = calendar.date(byAdding: .day, value: -6, to: endDate)!
+            guard let endDate = calendar.date(byAdding: .weekOfYear, value: offset, to: today),
+                  let startDate = calendar.date(byAdding: .day, value: -6, to: endDate) else {
+                return String(localized: "This Week")
+            }
             if offset == 0 {
                 return String(localized: "This Week")
             }
             return "\(startDate.formatted(.dateTime.day().month(.abbreviated))) – \(endDate.formatted(.dateTime.day().month(.abbreviated)))"
         case .month:
-            let refDate = calendar.date(byAdding: .month, value: offset, to: today)!
+            guard let refDate = calendar.date(byAdding: .month, value: offset, to: today) else {
+                return String(localized: "This Month")
+            }
             let comps = calendar.dateComponents([.year, .month], from: refDate)
-            let monthStart = calendar.date(from: comps)!
+            guard let monthStart = calendar.date(from: comps) else {
+                return String(localized: "This Month")
+            }
             if offset == 0 {
                 return String(localized: "This Month")
             }
             return monthStart.formatted(.dateTime.month(.wide).year())
         }
     }
-    
-    private var isCurrentPeriod: Bool { offset == 0 }
     
     // MARK: Data aggregation
     
@@ -73,23 +93,24 @@ struct WeeklyChartView: View {
         
         switch selectedRange {
         case .week:
-            let endDate = calendar.date(byAdding: .weekOfYear, value: offset, to: today)!
+            guard let endDate = calendar.date(byAdding: .weekOfYear, value: offset, to: today) else { return [] }
             return makeDailyBuckets(days: 7, endingAt: endDate, calendar: calendar, shortLabels: true)
         case .month:
-            let refDate = calendar.date(byAdding: .month, value: offset, to: today)!
+            guard let refDate = calendar.date(byAdding: .month, value: offset, to: today) else { return [] }
             let comps = calendar.dateComponents([.year, .month], from: refDate)
-            let monthStart = calendar.date(from: comps)!
-            let monthEnd = calendar.date(byAdding: .month, value: 1, to: monthStart)!
+            guard let monthStart = calendar.date(from: comps),
+                  let monthEnd = calendar.date(byAdding: .month, value: 1, to: monthStart),
+                  let lastDay = calendar.date(byAdding: .day, value: -1, to: monthEnd) else { return [] }
             let daysInMonth = calendar.dateComponents([.day], from: monthStart, to: monthEnd).day ?? 30
-            return makeDailyBuckets(days: daysInMonth, endingAt: calendar.date(byAdding: .day, value: -1, to: monthEnd)!, calendar: calendar, shortLabels: false)
+            return makeDailyBuckets(days: daysInMonth, endingAt: lastDay, calendar: calendar, shortLabels: false)
         }
     }
     
     private func makeDailyBuckets(days: Int, endingAt end: Date, calendar: Calendar, shortLabels: Bool) -> [CalorieBucket] {
-        (0..<days).reversed().map { daysAgo in
-            let date = calendar.date(byAdding: .day, value: -daysAgo, to: end)!
+        (0..<days).reversed().compactMap { daysAgo in
+            guard let date = calendar.date(byAdding: .day, value: -daysAgo, to: end) else { return nil }
             let dayStart = calendar.startOfDay(for: date)
-            let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart)!
+            guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) else { return nil }
             let cals = caloriesFor(start: dayStart, end: dayEnd)
             let label = shortLabels
             ? date.formatted(.dateTime.weekday(.abbreviated))
@@ -116,7 +137,7 @@ struct WeeklyChartView: View {
     // MARK: Body
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
                 // Range picker
                 Section {
@@ -142,6 +163,7 @@ struct WeeklyChartView: View {
                                     .font(.caption)
                             }
                             .buttonStyle(.borderless)
+                            .disabled(isEarliestPeriod)
                             
                             Spacer()
                             Text(periodLabel)

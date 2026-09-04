@@ -37,6 +37,9 @@ struct SettingsView: View {
     @State private var showImportAlert = false
     @State private var exportDocument: JSONDocument?
     @State private var pendingImportScope: ImportScope = .both
+    @State private var importErrorMessage: String?
+    @State private var showImportError = false
+    @State private var showExportError = false
 
     var body: some View {
         // @Observable braucht @Bindable für Bindings in Views
@@ -64,7 +67,7 @@ struct SettingsView: View {
                 Section(header: Text("Appearance")) {
                     Picker("Design", selection: $settings.design) {
                         ForEach(Design.allCases, id: \.self) { option in
-                            Text(option.rawValue.capitalized)
+                            Text(option.displayName)
                                 .tag(option)
                         }
                     }
@@ -126,12 +129,20 @@ struct SettingsView: View {
                 isPresented: $showImporter,
                 allowedContentTypes: [.json]
             ) { result in
-                guard let url = try? result.get(),
-                      url.startAccessingSecurityScopedResource() else { return }
-                defer { url.stopAccessingSecurityScopedResource() }
-                guard let data = try? Data(contentsOf: url) else { return }
-
-                handleImport(data: data, scope: pendingImportScope)
+                do {
+                    let url = try result.get()
+                    guard url.startAccessingSecurityScopedResource() else {
+                        importErrorMessage = String(localized: "Could not access the selected file.")
+                        showImportError = true
+                        return
+                    }
+                    defer { url.stopAccessingSecurityScopedResource() }
+                    let data = try Data(contentsOf: url)
+                    handleImport(data: data, scope: pendingImportScope)
+                } catch {
+                    importErrorMessage = error.localizedDescription
+                    showImportError = true
+                }
             }
             .alert("Import Complete", isPresented: $showImportAlert) {
                 Button("OK") { }
@@ -139,6 +150,16 @@ struct SettingsView: View {
                 if let r = importResult {
                     Text(importSummary(r))
                 }
+            }
+            .alert("Import Failed", isPresented: $showImportError) {
+                Button("OK") { }
+            } message: {
+                Text(importErrorMessage ?? "")
+            }
+            .alert("Export Failed", isPresented: $showExportError) {
+                Button("OK") { }
+            } message: {
+                Text(String(localized: "The data could not be prepared for export."))
             }
         }
     }
@@ -158,9 +179,12 @@ struct SettingsView: View {
                 history: consumptions.map { ConsumptionDTO(from: $0) }
             )
         }
-        if let data = try? JSONEncoder().encode(dto) {
+        do {
+            let data = try JSONEncoder().encode(dto)
             exportDocument = JSONDocument(data: data)
             showExporter = true
+        } catch {
+            showExportError = true
         }
     }
 
@@ -176,7 +200,7 @@ struct SettingsView: View {
         if let dto = try? JSONDecoder().decode(TrackoryExportDTO.self, from: data) {
             if scope != .history, let dtoItems = dto.items {
                 for item in dtoItems {
-                    if items.contains(where: { item.matches($0) }) {
+                    if ImportDeduplication.isDuplicateItem(item, in: items) {
                         skippedItems += 1
                     } else {
                         modelContext.insert(Item(
@@ -192,12 +216,7 @@ struct SettingsView: View {
             }
             if scope != .items, let dtoHistory = dto.history {
                 for entry in dtoHistory {
-                    let isDuplicate = consumptions.contains {
-                        $0.itemId == entry.itemId &&
-                        Calendar.current.isDate($0.date, equalTo: entry.date, toGranularity: .minute) &&
-                        $0.quantity == entry.quantity
-                    }
-                    if isDuplicate {
+                    if ImportDeduplication.isDuplicateConsumption(entry, in: consumptions) {
                         skippedHistory += 1
                     } else {
                         modelContext.insert(Consumption(
@@ -218,7 +237,7 @@ struct SettingsView: View {
                   let legacyItems = try? JSONDecoder().decode([ItemDTO].self, from: data) {
             // Legacy export: plain [ItemDTO] array
             for item in legacyItems {
-                if items.contains(where: { item.matches($0) }) {
+                if ImportDeduplication.isDuplicateItem(item, in: items) {
                     skippedItems += 1
                 } else {
                     modelContext.insert(Item(

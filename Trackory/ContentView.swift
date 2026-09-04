@@ -9,18 +9,8 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AppSettings.self) private var settings
-    @AppStorage(UserDefaultsKey.colorScheme.rawValue) private var colorSchemeSetting: String = Design.system.rawValue
-    
     @State private var selectedTab: Int = 0
     @State private var selectedDate: Date = Date()
-    
-    private var preferredScheme: ColorScheme? {
-        switch Design(rawValue: colorSchemeSetting) ?? .system {
-        case .system: return nil
-        case .light: return .light
-        case .dark: return .dark
-        }
-    }
     
     var body: some View {
         TabView(selection: $selectedTab) {

@@ -92,27 +92,23 @@ struct CalorieCalculatorView: View {
         nonmutating set { settings.calcGoal = newValue.rawValue }
     }
     
-    private var age: Double? { Double(settings.calcAge) }
-    private var weight: Double? { Double(settings.calcWeight) }
-    private var height: Double? { Double(settings.calcHeight) }
-    
     private var isInputComplete: Bool {
-        guard let weight, let height, let age else { return false }
-        return weight > 0 && height > 0 && age > 0
+        guard let age = settings.calcAge, let weight = settings.calcWeight, let height = settings.calcHeight else { return false }
+        return age > 0 && weight > 0 && height > 0
     }
-    
+
     private var bmr: Double? {
-        guard isInputComplete, let weight, let height, let age else { return nil }
-        let base = 10.0 * weight + 6.25 * height - 5.0 * age
-        switch sex {
-        case .male: return base + 5
-        case .female: return base - 161
-        }
+        guard let age = settings.calcAge, let weight = settings.calcWeight, let height = settings.calcHeight,
+              age > 0, weight > 0, height > 0 else { return nil }
+        let calcSex: CalorieCalculator.Sex = sex == .male ? .male : .female
+        return CalorieCalculator.bmr(sex: calcSex, age: age, weightKg: weight, heightCm: height)
     }
-    
+
     private var totalCalories: Int? {
         guard let bmr else { return nil }
-        return max(1200, Int((bmr * activityLevel.factor + weightGoal.calorieOffset).rounded()))
+        let activity = CalorieCalculator.ActivityLevel(rawValue: activityLevel.factor) ?? .sedentary
+        let goal = CalorieCalculator.WeightGoal(rawValue: weightGoal.calorieOffset) ?? .maintain
+        return CalorieCalculator.totalCalories(bmr: bmr, activity: activity, goal: goal)
     }
     
     var body: some View {
@@ -128,7 +124,7 @@ struct CalorieCalculatorView: View {
                 HStack {
                     Text("Age")
                     Spacer()
-                    TextField("e.g. 25", text: $settings.calcAge)
+                    TextField("e.g. 25", value: $settings.calcAge, format: .number)
                         .keyboardType(.numberPad)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 80)
@@ -136,7 +132,7 @@ struct CalorieCalculatorView: View {
                 HStack {
                     Text("Weight (kg)")
                     Spacer()
-                    TextField("e.g. 75", text: $settings.calcWeight)
+                    TextField("e.g. 75", value: $settings.calcWeight, format: .number)
                         .keyboardType(.decimalPad)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 80)
@@ -144,7 +140,7 @@ struct CalorieCalculatorView: View {
                 HStack {
                     Text("Height (cm)")
                     Spacer()
-                    TextField("e.g. 180", text: $settings.calcHeight)
+                    TextField("e.g. 180", value: $settings.calcHeight, format: .number)
                         .keyboardType(.numberPad)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 80)

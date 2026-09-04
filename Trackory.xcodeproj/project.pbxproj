@@ -6,8 +6,24 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		421A74D3DF8700A5C14CC761 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 830D3329B7F08AFDB0E40501 /* Foundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9C0A13805D771DDE956911FA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0085F8922F1C0F14007D7BD5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0085F8992F1C0F14007D7BD5;
+			remoteInfo = Trackory;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		0085F89A2F1C0F14007D7BD5 /* Trackory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trackory.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		830D3329B7F08AFDB0E40501 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		841EA524F084AE53D553EB1F /* TrackoryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = TrackoryTests.xctest; path = .xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -15,6 +31,11 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Trackory;
 			sourceTree = "<group>";
+		};
+		2B3284AFC0D0C1832484C3F4 /* TrackoryTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TrackoryTests;
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -26,6 +47,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E9A9EE0D923C883B3F55B05E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				421A74D3DF8700A5C14CC761 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -34,6 +63,8 @@
 			children = (
 				0085F89C2F1C0F14007D7BD5 /* Trackory */,
 				0085F89B2F1C0F14007D7BD5 /* Products */,
+				48AAA6091585638204377C9E /* Frameworks */,
+				2B3284AFC0D0C1832484C3F4 /* TrackoryTests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -41,8 +72,25 @@
 			isa = PBXGroup;
 			children = (
 				0085F89A2F1C0F14007D7BD5 /* Trackory.app */,
+				841EA524F084AE53D553EB1F /* TrackoryTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		48AAA6091585638204377C9E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D31CEA02BE1FB81629384897 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D31CEA02BE1FB81629384897 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				830D3329B7F08AFDB0E40501 /* Foundation.framework */,
+			);
+			name = iOS;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -64,11 +112,27 @@
 				0085F89C2F1C0F14007D7BD5 /* Trackory */,
 			);
 			name = Trackory;
-			packageProductDependencies = (
-			);
 			productName = Trackory;
 			productReference = 0085F89A2F1C0F14007D7BD5 /* Trackory.app */;
 			productType = "com.apple.product-type.application";
+		};
+		0EA7EA982C002162E8B28132 /* TrackoryTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5EC20136AA7A43DC6ACE90DD /* Build configuration list for PBXNativeTarget "TrackoryTests" */;
+			buildPhases = (
+				2CC655701A6AA9581C0DFAAD /* Sources */,
+				E9A9EE0D923C883B3F55B05E /* Frameworks */,
+				1ECA653FD5A7DB3B7BA9C768 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0DD56F919C408C8C9A554D6C /* PBXTargetDependency */,
+			);
+			name = TrackoryTests;
+			productName = TrackoryTests;
+			productReference = 841EA524F084AE53D553EB1F /* TrackoryTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -100,12 +164,20 @@
 			projectRoot = "";
 			targets = (
 				0085F8992F1C0F14007D7BD5 /* Trackory */,
+				0EA7EA982C002162E8B28132 /* TrackoryTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		0085F8982F1C0F14007D7BD5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1ECA653FD5A7DB3B7BA9C768 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +194,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		2CC655701A6AA9581C0DFAAD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0DD56F919C408C8C9A554D6C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Trackory;
+			target = 0085F8992F1C0F14007D7BD5 /* Trackory */;
+			targetProxy = 9C0A13805D771DDE956911FA /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		0085F8A32F1C0F16007D7BD5 /* Debug */ = {
@@ -316,6 +404,45 @@
 			};
 			name = Release;
 		};
+		5CB3165DCB478BDD943E7FF5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = de.xires.TrackoryTests;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_TESTING_ENABLED = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E8B2D3DF7FBE5C204CEF96A2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = de.xires.TrackoryTests;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_TESTING_ENABLED = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "";
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -333,6 +460,15 @@
 			buildConfigurations = (
 				0085F8A62F1C0F16007D7BD5 /* Debug */,
 				0085F8A72F1C0F16007D7BD5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5EC20136AA7A43DC6ACE90DD /* Build configuration list for PBXNativeTarget "TrackoryTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5CB3165DCB478BDD943E7FF5 /* Release */,
+				E8B2D3DF7FBE5C204CEF96A2 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

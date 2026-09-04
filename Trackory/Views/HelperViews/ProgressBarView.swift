@@ -17,13 +17,11 @@ struct ProgressBarView: View {
     @State private var showDetail = false
 
     private var dayConsumptions: [Consumption] {
-        let calendar = Calendar.current
-        let day = calendar.startOfDay(for: selectedDate)
-        return consumptions.filter { calendar.startOfDay(for: $0.date) == day }
+        consumptions.on(selectedDate)
     }
 
     private var totalCalories: Float {
-        dayConsumptions.reduce(0) { $0 + Float($1.calories * Double($1.quantity)) }
+        dayConsumptions.totalCalories
     }
 
     private var remainingCalories: Float {
@@ -64,26 +62,13 @@ struct MacroDetailView: View {
     var selectedDate: Date
 
     private var dayConsumptions: [Consumption] {
-        let calendar = Calendar.current
-        let day = calendar.startOfDay(for: selectedDate)
-        return consumptions.filter { calendar.startOfDay(for: $0.date) == day }
+        consumptions.on(selectedDate)
     }
 
-    private var totalCalories: Float {
-        dayConsumptions.reduce(0) { $0 + Float($1.calories * Double($1.quantity)) }
-    }
-
-    private var totalProtein: Float {
-        dayConsumptions.reduce(0) { $0 + Float($1.protein * Double($1.quantity)) }
-    }
-
-    private var totalCarbs: Float {
-        dayConsumptions.reduce(0) { $0 + Float($1.carbohydrates * Double($1.quantity)) }
-    }
-
-    private var totalFat: Float {
-        dayConsumptions.reduce(0) { $0 + Float($1.fat * Double($1.quantity)) }
-    }
+    private var totalCalories: Float { dayConsumptions.totalCalories }
+    private var totalProtein: Float  { dayConsumptions.totalProtein }
+    private var totalCarbs: Float    { dayConsumptions.totalCarbs }
+    private var totalFat: Float      { dayConsumptions.totalFat }
 
     private var remainingCalories: Float {
         max(settings.calorieTarget - totalCalories, 0)
